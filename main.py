@@ -52,6 +52,46 @@ def forward_selection(total_features):
     # Final output is handled by the calling block to match the trace
     return max_feature_set, max_score
 
+def backward_elimination(total_features):
+    curr_features = list(total_features) # Start with all features
+    max_score = stub_evaluation(curr_features)
+    max_feature_set = list(curr_features)
+
+    print(f"Starting Backward Elimination with all features: {curr_features}. Initial score: {max_score:.1f}")
+
+    while True:
+        feature_to_remove = None
+        check_max_score = -1 # Initialize with a score worse than any possible random score (0-1)
+
+        # If only one feature is left, we can't remove any more
+        if len(curr_features) <= 1:
+            print("Only one feature left, stopping backward elimination.")
+            break
+
+        for feature in curr_features:
+            test_set = [f for f in curr_features if f != feature]
+            # Evaluate the set *after* removing a feature
+            score_after_removal = stub_evaluation(test_set)
+
+            # We are looking for the removal that yields the highest score
+            # (or least drop, if the score generally decreases with fewer features)
+            if score_after_removal > check_max_score:
+                check_max_score = score_after_removal
+                feature_to_remove = feature
+
+        # Check if removing the best feature from this iteration improves the overall best score
+        if check_max_score > best_score:
+            curr_features.remove(feature_to_remove)
+            max_score = check_max_score
+            max_feature_set = list(curr_features) # Update the best set
+            print(f"Removed feature: {feature_to_remove}. Current best score: {max_score:.1f}, Current best set: {max_feature_set}")
+        else:
+            # No improvement by removing any more features, stop
+            print("No further improvement by removing features. Stopping backward elimination.")
+            break
+
+    return max_feature_set, max_score
+
 def main(): #main function to run the program
     print(f"Welcome to Feature Selection Algorithm.")
 
