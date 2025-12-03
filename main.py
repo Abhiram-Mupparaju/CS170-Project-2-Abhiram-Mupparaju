@@ -39,6 +39,39 @@ class NN_classifier:
         self.training_instance = processed_data
 
 
+class Leave_One_Out_Validator: #input feature subset, NN classifier and the dataset
+    def __init__(self):
+        pass
+
+    def evaluate(self, nnclassifier, feature_subset, dataset):
+        correct_class = 0
+        total_instances = len(dataset)
+
+        if total_instances == 0: #safety check
+            print("Error: Dataset is empty")
+            return 0.0
+
+        for i in range(total_instances): 
+            training_set = [dataset[j] for j in range(total_instances) if j != i] #leave one instance out
+
+            test_instance_curr = dataset[i] #prepare current instance for test
+            correct_label = test_instance_curr[0]
+
+            #get features for test
+            test_instance_features = [test_instance_curr[feature_index] for feature_index in feature_subset] 
+
+            #call nnclasifier to train with data
+            nnclassifier.train(training_set, feature_subset)
+
+            # test classifer with current instance
+            predicted_label = nnclassifier.test(test_instance_features)
+
+            if predicted_label == correct_label:
+                correct_class += 1
+
+        accuracy = (correct_class / total_instances) * 100
+        return accuracy
+
 def forward_selection(total_features):
     curr_features = []
     
