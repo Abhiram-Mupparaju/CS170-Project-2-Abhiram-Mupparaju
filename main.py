@@ -38,6 +38,22 @@ class NN_classifier:
 
         self.training_instance = processed_data
 
+    def test(self, test_instance):
+        if self.training_instance is None or not self.training_instance: #check if lcassifier has been trained
+            raise ValueError("Error: Classifier has not been trained")
+
+        min_distance = float('inf') #initialize with infinty
+        predicted_class_label = None
+
+        for training_feature_vector, training_label in self.training_instance:
+            check_distance = self.euclidean_distance(test_instance, training_feature_vector)
+
+            if check_distance < min_distance:
+                min_distance = check_distance
+                predicted_class_label = training_label
+
+        return predicted_class_label
+
 
 class Leave_One_Out_Validator: #input feature subset, NN classifier and the dataset
     def __init__(self):
