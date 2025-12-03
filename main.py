@@ -1,20 +1,43 @@
 import random
+import math
+import heapq
+import copy
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sb
-import random as rand
-from sklearn.model_selection import train_test_split
-from sklearn.manifold import TSNE
 
-small_dataset = np.loadtxt('small-test-dataset-2-2.txt')
-large_dataset = np.loadtxt('large-test-dataset-2.txt')
-# lines 2 - 11 copied from my assignments in CS171
+small_dataset = np.loadtxt('/workspaces/CS170-Project-2-Abhiram-Mupparaju/small-test-dataset-2-2.txt')
+large_dataset = np.loadtxt('/workspaces/CS170-Project-2-Abhiram-Mupparaju/large-test-dataset-2.txt')
+# lines 3 - 7 copied using templates from my assignments in CS171
 
 def stub_evaluation():
 
     # Return a random percent between 0.0 and 100.0
     return random.random() * 100.0
+
+class NN_classifier:
+    def __init__(self):
+        self.training_instance = None
+
+    def euclidean_distance(self, point_1, point_2):
+        if len(point_1) != len(point_2): #check if lists have the same dimensionality
+            raise ValueError("Error: Lists have different dimensionalities")
+
+        euclidean = [(p1 - p2)**2 for p1, p2 in zip(point_1, point_2)] #calculate the euclidean distance
+        return math.sqrt(sum(euclidean))
+
+    def train(self, training_instance, selected_features=None):
+        processed_data = []
+        for instance in training_instance:
+            label = instance[0] #first element is set as label
+            if selected_features:
+                feature_vector = [instance[feature_index] for feature_index in selected_features]
+            else: #use all features if not specified
+                feature_vector = instance[1:]
+
+            processed_data.append((feature_vector, label))
+
+        self.training_instance = processed_data
+
 
 def forward_selection(total_features):
     curr_features = []
@@ -91,7 +114,7 @@ def backward_elimination(total_features):
                 feature_to_remove = feature
 
         # Check if removing the best feature from this iteration improves the overall best score
-        if check_max_score > best_score:
+        if check_max_score > max_score:
             curr_features.remove(feature_to_remove)
             max_score = check_max_score
             max_feature_set = list(curr_features) # Update the best set
