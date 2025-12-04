@@ -1,5 +1,6 @@
 import random
 import math
+import time
 import heapq
 import copy
 import numpy as np
@@ -52,8 +53,7 @@ class NN_classifier:
                 min_distance = check_distance
                 predicted_class_label = training_label
 
-        return predicted_class_label
-
+        return predicted_class_label # Only return predicted label, time calculation handled by caller
 
 class Leave_One_Out_Validator: #input feature subset, NN classifier and the dataset
     def __init__(self):
@@ -63,30 +63,33 @@ class Leave_One_Out_Validator: #input feature subset, NN classifier and the data
         correct_class = 0
         total_instances = len(dataset)
 
+        total_nn_classifier_time = 0.0  # Initialize total time for NN classifier operations (train + test)
+
         if total_instances == 0: #safety check
             print("Error: Dataset is empty")
-            return 0.0
+            return 0.0, 0.0 # Return accuracy, total_nn_classifier_time
 
-        for i in range(total_instances): 
+        for i in range(total_instances):
             training_set = [dataset[j] for j in range(total_instances) if j != i] #leave one instance out
 
             test_instance_curr = dataset[i] #prepare current instance for test
             correct_label = test_instance_curr[0]
 
             #get features for test
-            test_instance_features = [test_instance_curr[feature_index] for feature_index in feature_subset] 
+            test_instance_features = [test_instance_curr[feature_index] for feature_index in feature_subset]
 
-            #call nnclasifier to train with data
+            #get time spent on nn_classifer step
+            nn_start_time = time.time()
             nnclassifier.train(training_set, feature_subset)
-
-            # test classifer with current instance
             predicted_label = nnclassifier.test(test_instance_features)
+            nn_end_time = time.time()
+            total_nn_classifier_time += (nn_end_time - nn_start_time)
 
             if predicted_label == correct_label:
                 correct_class += 1
 
         accuracy = (correct_class / total_instances) * 100
-        return accuracy
+        return accuracy, total_nn_classifier_time # Return accuracy and NN_classifier time
 
 def forward_selection(total_features):
     curr_features = []
@@ -175,10 +178,53 @@ def backward_elimination(total_features):
 
     return max_feature_set, max_score
 
+def part_2_trace():
+  print("\nSmall Dataset Trace")
+  start_overall_small = time.time() # start timer
+
+
+  #Initialize objects
+  classifier_small = NN_classifier()
+  validator_small = Leave_One_Out_Validator()
+
+  small_dataset_features = [3, 5, 7] # example features
+
+  # Call validator functions
+  accuracy_small_dataset, nn_classifier_time_small = validator_small.evaluate(classifier_small, small_dataset_features, small_dataset)
+
+  end_overall_small = time.time() # End overall timing for small dataset evaluation
+  overall_time_small = end_overall_small - start_overall_small
+
+  # Print results
+  print(f"Small dataset accuracy {small_dataset_features}: {accuracy_small_dataset:.2f}%")
+  print(f"Small dataset NN-Classifier Time: {nn_classifier_time_small:.4f} seconds") 
+  print(f"Small dataset Validator evaluation time: {overall_time_small:.4f} seconds")
+
+  print("\nLarge Dataset Trace")
+  start_overall_large = time.time() # start timer
+
+
+  #Initialize objects
+  classifier_large = NN_classifier()
+  validator_large = Leave_One_Out_Validator()
+
+  large_dataset_features = [1, 15, 27] # example features
+
+  # Call evaluate functions, now expecting only 2 return values
+  accuracy_large_dataset, nn_classifier_time_large = validator_large.evaluate(classifier_large, large_dataset_features, large_dataset)
+
+  end_overall_large = time.time() # End overall timing for small dataset evaluation
+  overall_time_large = end_overall_large - start_overall_large
+
+  # Print results
+  print(f"Large dataset accuracy {large_dataset_features}: {accuracy_large_dataset:.2f}%")
+  print(f"Large dataset NN-Classifier Time: {nn_classifier_time_large:.4f} seconds") 
+  print(f"Large dataset Validator evaluation time: {overall_time_large:.4f} seconds")
+
 def main(): #main function to run the program
     print(f"Welcome to Feature Selection Algorithm.")
 
-    user_input_features = int(input("Please enter total number of features: "))
+    user_input_features = int(input("Please enter total number of features: (just type 1 for part 2 trace, this input doesnt affect it)"))
 
     total_features = [] # Initialize an empty list
     for i in range(1, user_input_features + 1):
@@ -188,6 +234,7 @@ def main(): #main function to run the program
     print("1) Forward Selection")
     print("2) Backward Elimination")
     print("3) Special Algorithm.")
+    print("4) Part 2 trace")
 
     algorithm_choice = input()
 
@@ -197,8 +244,13 @@ def main(): #main function to run the program
         print(f"Finished search!! The best feature subset is {{{', '.join(map(str, sorted(best_feature_set)))}}}, which has an accuracy of {best_score:.1f}%")
     elif algorithm_choice == "2":
         print("2) Backward Elimination")
+        best_feature_set, best_score = forward_selection(total_features)
+        print(f"Finished search!! The best feature subset is {{{', '.join(map(str, sorted(best_feature_set)))}}}, which has an accuracy of {best_score:.1f}%")
     elif algorithm_choice == "3":
         print("3) Special Algorithm.")
+    elif algorithm_choice == "4":
+        part_2_trace()
+        print("\nPart 2 trace for Submission")
     else:
         print("Invalid")
 
