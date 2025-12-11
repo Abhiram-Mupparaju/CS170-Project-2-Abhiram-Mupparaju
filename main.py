@@ -11,7 +11,17 @@ large_dataset_original = np.loadtxt('/workspaces/CS170-Project-2-Abhiram-Muppara
 titanic_dataset_original = np.loadtxt('/workspaces/CS170-Project-2-Abhiram-Mupparaju/titanic-clean-2.txt')
 # lines 3 - 7 copied using templates from my assignments in CS171
 
-def min_max_normalize(dataset): #taken from geeksforgeeks cited in report
+#- Group: Abhiram Mupparaju - amupp001 - Lecture Session 1 - Discussion section 021
+# DatasetID: 211
+# Small Dataset Results:
+#   Forward: Feature Subset: {3, 5}, Acc: 0.92 (92%)
+#   Backward: Feature Subset: {2, 3, 4, 5} Acc: 0.83 (83.0%)
+# Large Dataset Results:
+#   Forward: Feature Subset: {1, 27}, Acc: 0.955 (95.5%)
+#   Backward: Feature Subset: {1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40}, Acc: 0.711 (71.1%)
+
+
+def min_max_normalize(dataset): #made with assistance from geeksforgeeks cited in report
     # Separate first column of labels from features
     labels = dataset[:, 0]
     features = dataset[:, 1:]
@@ -110,17 +120,17 @@ class Leave_One_Out_Validator: #input feature subset, NN classifier and the data
                     class_counts[label] = class_counts.get(label, 0) + 1
 
                 if not class_counts: #safety case for if datyaset has only 1 value
-                    predicted_majority_class = -1
+                    predicted_majority_class = 0
                 else:
                     # Find the class with the maximum count
                     max_count = 0
-                    predicted_majority_class = -1
+                    predicted_majority_class = 0
                     for class_label, count in class_counts.items():
                         if count > max_count:
                             max_count = count
                             predicted_majority_class = class_label
                         elif count == max_count: # Tie-breaking: smaller label wins or simply pick first seen
-                            if predicted_majority_class == -1 or class_label < predicted_majority_class:
+                            if predicted_majority_class == 0 or class_label < predicted_majority_class:
                                 predicted_majority_class = class_label # In case of a tie pick smallest label to be consistent
 
                 if predicted_majority_class == correct_label:
@@ -170,7 +180,7 @@ def forward_selection(total_features_list, dataset, validator):
 
     while True:
         feature_to_add_in_current_step = None
-        best_accuracy_in_current_step = -1.0 # Tracks highest accuracy achieved by adding 1 feature
+        best_accuracy_in_current_step = 0.0 # Tracks highest accuracy achieved by adding 1 feature
         best_set_candidate_for_printing_in_current_step = [] # The feature set that yields best_accuracy_in_current_step
 
         features_remaining = [f for f in total_features_list if f not in curr_features]
@@ -238,7 +248,7 @@ def backward_elimination(total_features_list, dataset, validator):
 
     while True:
         feature_to_remove_in_current_step = None # The feature to remove that will get the highest accuracy
-        best_accuracy_in_current_step = -1.0 # Accuracy achieved by removing said feature
+        best_accuracy_in_current_step = 0.0 # Accuracy achieved by removing said feature
 
         next_curr_features_candidate = []
 
@@ -347,7 +357,6 @@ def main(): #main function to run the program
     print("1) Forward Selection")
     print("2) Backward Elimination")
     print("3) Special Algorithm.")
-    print("4) Part 2 trace")
 
     algorithm_choice = input()
 
@@ -363,9 +372,6 @@ def main(): #main function to run the program
         print(f"Finished search!! The best feature subset is {{{', '.join(map(str, sorted(best_feature_set)))}}}, which has an accuracy of {best_score:.1f}%")
     elif algorithm_choice == "3":
         print("3) Special Algorithm.")
-    elif algorithm_choice == "4":
-        part_2_trace()
-        print("\nPart 2 trace for Submission")
     else:
         print("Invalid")
 
