@@ -12,7 +12,7 @@ titanic_dataset_original = np.loadtxt('/workspaces/CS170-Project-2-Abhiram-Muppa
 # lines 3 - 7 copied using templates from my assignments in CS171
 
 #- Group: Abhiram Mupparaju - amupp001 - Lecture Session 1 - Discussion section 021
-# DatasetID: 211
+# DatasetID: 
 # Small Dataset Results:
 #   Forward: Feature Subset: {3, 5}, Acc: 0.92 (92%)
 #   Backward: Feature Subset: {2, 3, 4, 5} Acc: 0.83 (83.0%)
@@ -283,49 +283,6 @@ def backward_elimination(total_features_list, dataset, validator):
             break 
 
     return max_feature_set, max_score
-
-def part_2_trace():
-  print("\nSmall Dataset Trace")
-  start_overall_small = time.time() # start timer
-
-
-  #Initialize objects
-  classifier_small = NN_classifier()
-  validator_small = Leave_One_Out_Validator()
-
-  small_dataset_features = [3, 5, 7] # example features
-
-  # Call validator functions
-  accuracy_small_dataset, nn_classifier_time_small = validator_small.evaluate(classifier_small, small_dataset_features, small_dataset)
-
-  end_overall_small = time.time() # End overall timing for small dataset evaluation
-  overall_time_small = end_overall_small - start_overall_small
-
-  # Print results
-  print(f"Small dataset accuracy {small_dataset_features}: {accuracy_small_dataset:.2f}%")
-  print(f"Small dataset NN-Classifier Time: {nn_classifier_time_small:.4f} seconds")
-  print(f"Small dataset Validator evaluation time: {overall_time_small:.4f} seconds")
-
-  print("\nLarge Dataset Trace")
-  start_overall_large = time.time() # start timer
-
-
-  #Initialize objects
-  classifier_large = NN_classifier()
-  validator_large = Leave_One_Out_Validator()
-
-  large_dataset_features = [1, 15, 27] # example features
-
-  # Call evaluate functions, now expecting only 2 return values
-  accuracy_large_dataset, nn_classifier_time_large = validator_large.evaluate(classifier_large, large_dataset_features, large_dataset)
-
-  end_overall_large = time.time() # End overall timing for small dataset evaluation
-  overall_time_large = end_overall_large - start_overall_large
-
-  # Print results
-  print(f"Large dataset accuracy {large_dataset_features}: {accuracy_large_dataset:.2f}%")
-  print(f"Large dataset NN-Classifier Time: {nn_classifier_time_large:.4f} seconds")
-  print(f"Large dataset Validator evaluation time: {overall_time_large:.4f} seconds")
 
 def main(): #main function to run the program
     print(f"Welcome to My Feature Selection Algorithm.") # Changed name as per request
